@@ -840,7 +840,7 @@ td.prob { max-width: 320px; color: var(--ink-2); overflow-wrap: anywhere; }
 
   /* ---------- Google Sheets via Apps Script ---------- */
   // ผู้ดูแล: วาง URL ของ Apps Script Web App (…/exec) ที่นี่หลัง Deploy เพื่อให้ทุกคนไม่ต้องกรอกเอง
-  const DEFAULT_API = "";
+  const DEFAULT_API = "https://script.google.com/macros/s/AKfycbxdKBVOCsnZSnpYMNjcqzsYyaJfTz05oT_vltiiLcc_hu0L3whxbB5bUNpqb1zQk6AF/exec";
   let API = store.get("er-api") || DEFAULT_API;
   let KEY = store.get("er-key") || "";
   let sheetRecs = new Map();          // kept for rebuild(); the sheet itself is the store here
