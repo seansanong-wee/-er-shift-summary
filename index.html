@@ -225,6 +225,9 @@ main {
 .seg button[aria-pressed="true"] { background: linear-gradient(135deg, var(--moph-3), var(--moph)); color: var(--accent-ink); box-shadow: 0 4px 14px -4px var(--glow); }
 select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23768397' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13.5px; cursor: pointer; }
 .range-label { font-size: 13px; color: var(--ink-2); }
+.month-pick { display: inline-flex; gap: 4px; align-items: center; }
+.month-pick .btn.sm { padding: 6px 10px; font-size: 15px; line-height: 1; }
+.month-pick select[data-active="true"] { border-color: var(--moph); box-shadow: 0 0 0 3px var(--accent-wash); color: var(--moph); font-weight: 600; }
 .range-label b { color: var(--ink); font-weight: 600; }
 
 /* KPI tiles */
@@ -541,6 +544,11 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <label class="range-label" for="fySel">ปีงบประมาณ</label>
         <select class="sel" id="fySel"><option value="">—</option></select>
+        <span class="month-pick">
+          <button type="button" class="btn sm" id="monthPrev" aria-label="เดือนก่อนหน้า">‹</button>
+          <select class="sel" id="monthSel" aria-label="เลือกเดือน"><option value="">เลือกเดือน…</option></select>
+          <button type="button" class="btn sm" id="monthNext" aria-label="เดือนถัดไป">›</button>
+        </span>
         <span class="range-label" id="rangeLabel"></span>
         <button type="button" class="sync-chip" id="syncChip" data-state="idle" title="ดูสถานะการเชื่อมต่อ Google Sheets"><span class="dot"></span><span id="syncChipText">Google Forms</span></button>
       </div>
@@ -1029,6 +1037,11 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       const start = new Date(ce - 1, 9, 1), end = new Date(ce, 8, 30);
       return { start, end: end > today ? today : end, label: `ปีงบประมาณ ${range.fy}` };
     }
+    if (range.kind === "m") {
+      const [y, m] = range.m.split("-").map(Number);
+      const start = new Date(y, m - 1, 1), end = new Date(y, m, 0);
+      return { start, end: end > today ? today : end, label: `${TH_MONTH_FULL[m - 1]} ${y + 543}` };
+    }
     if (range.kind === "month") {
       return { start: new Date(today.getFullYear(), today.getMonth(), 1), end: today, label: `${TH_MONTH_FULL[today.getMonth()]} ${today.getFullYear() + 543}` };
     }
@@ -1049,19 +1062,57 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     const cur = range.kind === "fy" ? String(range.fy) : "";
     sel.innerHTML = `<option value="">เลือกปีงบ…</option>` + list.map(y => `<option value="${y}">ปีงบ ${y}</option>`).join("");
     sel.value = cur;
+    buildMonthSelect();
   }
+  function monthList() {
+    const ms = new Set(records.map(r => r.date.slice(0, 7)));
+    const now = new Date(); ms.add(`${now.getFullYear()}-${pad(now.getMonth() + 1)}`);
+    return [...ms].sort();
+  }
+  function buildMonthSelect() {
+    const sel = $("#monthSel");
+    const list = monthList().reverse();
+    // group months under their fiscal year (Oct–Sep)
+    const groups = new Map();
+    for (const m of list) { const fy = fyOf(m + "-01"); if (!groups.has(fy)) groups.set(fy, []); groups.get(fy).push(m); }
+    sel.innerHTML = `<option value="">เลือกเดือน…</option>` + [...groups].map(([fy, ms]) =>
+      `<optgroup label="ปีงบ ${fy}">${ms.map(m => { const [y, mo] = m.split("-").map(Number); return `<option value="${m}">${TH_MONTH_FULL[mo - 1]} ${y + 543}</option>`; }).join("")}</optgroup>`).join("");
+    sel.value = range.kind === "m" ? range.m : "";
+    sel.dataset.active = range.kind === "m" ? "true" : "false";
+  }
+  function pickMonth(m) {
+    range = { kind: "m", m };
+    store.set("er-range", range);
+    $("#fySel").value = "";
+    buildMonthSelect();
+    renderDashboard();
+  }
+  function stepMonth(dir) {
+    const list = monthList();
+    const now = new Date();
+    const cur = range.kind === "m" ? range.m : `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+    let i = list.indexOf(cur);
+    if (i < 0) i = list.length - 1;
+    const next = list[Math.min(list.length - 1, Math.max(0, i + (range.kind === "m" ? dir : 0)))];
+    if (next) pickMonth(next);
+  }
+  $("#monthSel").addEventListener("change", e => { if (e.target.value) pickMonth(e.target.value); });
+  $("#monthPrev").addEventListener("click", () => stepMonth(-1));
+  $("#monthNext").addEventListener("click", () => stepMonth(1));
   $("#rangeSeg").addEventListener("click", e => {
     const b = e.target.closest("button[data-range]");
     if (!b) return;
     range = { kind: b.dataset.range };
     store.set("er-range", range);
     $("#fySel").value = "";
+    buildMonthSelect();
     renderDashboard();
   });
   $("#fySel").addEventListener("change", e => {
     if (!e.target.value) return;
     range = { kind: "fy", fy: Number(e.target.value) };
     store.set("er-range", range);
+    buildMonthSelect();
     renderDashboard();
   });
 
