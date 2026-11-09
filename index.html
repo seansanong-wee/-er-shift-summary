@@ -259,6 +259,7 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
 
 .grid-2 { display: grid; grid-template-columns: 1.65fr 1fr; gap: 18px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.grid-2.even { grid-template-columns: 1fr 1fr; }
 @media (max-width: 1040px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
 /* charts */
@@ -308,7 +309,16 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
 .status.ok { color: var(--good); border-color: color-mix(in oklab, var(--good) 40%, transparent); background: color-mix(in oklab, var(--good) 10%, transparent); }
 .status.warn { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 45%, transparent); background: color-mix(in oklab, var(--warn) 10%, transparent); }
 .status.crit { color: var(--crit); border-color: color-mix(in oklab, var(--crit) 45%, transparent); background: color-mix(in oklab, var(--crit) 10%, transparent); }
-.missing-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.missing-head { margin-top: 16px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.missing-head .hint { font-weight: 400; }
+.missing-table { margin-top: 8px; max-height: 60vh; overflow-y: auto; overscroll-behavior: contain; border-top: 1px solid var(--line); padding-right: 4px; }
+.missing-row { display: grid; grid-template-columns: 230px 1fr; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 560px) { .missing-row { grid-template-columns: 1fr; gap: 6px; } }
+.missing-date { font-size: 15px; font-weight: 600; color: var(--ink); }
+.missing-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.missing-chip { cursor: pointer; font-size: 15px; padding: 4px 12px; gap: 7px; }
+.missing-chip:hover { border-color: var(--crit); color: var(--crit); }
+.missing-chip .mono { font-weight: 400; color: var(--muted); }
 
 .empty { padding: 28px 12px; text-align: center; color: var(--muted); font-size: 14px; }
 
@@ -322,6 +332,12 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
   background: var(--panel); font-size: 15px;
 }
 .input:focus, .textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-wash); }
+/* date field shown as dd/mm/yyyy regardless of browser locale */
+.date-wrap { position: relative; }
+.date-wrap input { color: transparent; cursor: pointer; }
+.date-wrap input::-webkit-datetime-edit { color: transparent; }
+.date-show { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--ink); pointer-events: none; }
+.date-show.empty { color: var(--muted); }
 .textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
 .shift-pick { display: inline-flex; gap: 6px; flex-wrap: wrap; }
 .shift-pick button {
@@ -584,7 +600,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       </div>
     </div>
 
-    <div class="grid-3">
+    <div class="grid-2 even">
       <div class="panel">
         <div class="panel-head"><div><h2>การจำหน่ายผู้ป่วย</h2><div class="hint">สัดส่วนจากยอดรวมในช่วงที่เลือก</div></div></div>
         <div class="hbars" id="dispo"></div>
@@ -593,10 +609,11 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
         <div class="panel-head"><div><h2>ภาระงานตามวันและเวร</h2><div class="hint">ค่าเฉลี่ยผู้ป่วยต่อเวร · สีเข้ม = มาก</div></div></div>
         <div id="heat"></div>
       </div>
-      <div class="panel">
-        <div class="panel-head"><div><h2>ความครบถ้วนของบันทึก</h2><div class="hint">เวรที่ผ่านไปแล้วแต่ยังไม่มีสรุป</div></div></div>
-        <div id="complete"></div>
-      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><h2>ความครบถ้วนของบันทึก</h2><div class="hint">เวรที่ผ่านไปแล้วแต่ยังไม่มีสรุป</div></div></div>
+      <div id="complete"></div>
     </div>
 
     <div class="grid-2">
@@ -621,7 +638,10 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
         <div class="form-top">
           <div class="field">
             <label for="f-date">วันที่ปฏิบัติงาน</label>
-            <input class="input mono" type="date" id="f-date" required>
+            <div class="date-wrap">
+              <input class="input mono" type="date" id="f-date" required>
+              <span class="date-show mono" id="f-date-show" aria-hidden="true">วว/ดด/ปปปป</span>
+            </div>
           </div>
           <div class="field">
             <span class="field-label" id="shiftLbl">เวร</span>
@@ -1348,7 +1368,13 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     const pct = expected ? done / expected * 100 : 100;
     const cls = missing.length === 0 ? "ok" : missing.length <= 3 ? "warn" : "crit";
     const icon = cls === "ok" ? "✓" : "!";
-    const shown = missing.slice(-18).reverse();
+    // group missing shifts by date, newest first
+    const groups = [];
+    for (const m of missing.slice().reverse()) {
+      const g = groups[groups.length - 1];
+      if (g && g.date === m.date) g.shifts.push(m.s); else groups.push({ date: m.date, shifts: [m.s] });
+    }
+    groups.forEach(g => g.shifts.sort((a, b) => SH[a].from - SH[b].from));
     el.innerHTML = `
       <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
         <span class="kpi-value" style="font-size:34px">${pct.toFixed(0)}<span class="unit">%</span></span>
@@ -1356,7 +1382,14 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       </div>
       <div class="hint" style="margin-top:4px">บันทึกแล้ว ${fmtN(done)} จาก ${fmtN(expected)} เวรที่สิ้นสุดแล้ว</div>
       <div class="tri-bar" style="height:8px;margin-top:12px"><div style="flex:${done};background:var(--good)"></div><div style="flex:${missing.length};background:var(--crit);opacity:.7"></div></div>
-      ${shown.length ? `<div class="missing-list">${shown.map(m => `<button type="button" class="chip" data-fill="${m.date}|${m.s}" title="เปิดฟอร์มบันทึกเวรนี้" style="cursor:pointer"><i class="dot" style="background:var(--s-${m.s})"></i>${fmtDate(m.date)} ${SH[m.s].l}</button>`).join("")}${missing.length > shown.length ? `<span class="hint">และอีก ${missing.length - shown.length} เวร</span>` : ""}</div>` : ""}`;
+      ${groups.length ? `
+        <div class="missing-head">เวรที่ยังไม่บันทึก <span class="hint">(${fmtN(groups.length)} วัน · กดที่เวรเพื่อบันทึก)</span></div>
+        <div class="missing-table">${groups.map(g => `
+          <div class="missing-row">
+            <div class="missing-date">${fmtDateLong(g.date)}</div>
+            <div class="missing-list">${g.shifts.map(c => `<button type="button" class="chip missing-chip" data-fill="${g.date}|${c}" title="เปิดฟอร์มบันทึกเวร${SH[c].l} ${fmtDate(g.date)}"><i class="dot" style="background:var(--s-${c})"></i>เวร${SH[c].l} <span class="mono">${SH[c].t}</span></button>`).join("")}</div>
+          </div>`).join("")}
+        </div>` : ""}`;
   }
   $("#complete").addEventListener("click", e => {
     const b = e.target.closest("[data-fill]"); if (!b) return;
@@ -1454,8 +1487,15 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       }
     }
   }
+  function showDate() {
+    const v = $("#f-date").value, out = $("#f-date-show");
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+    out.textContent = m ? `${m[3]}/${m[2]}/${m[1]}` : "วว/ดด/ปปปป";
+    out.classList.toggle("empty", !m);
+  }
+
   function openRecord(date, s) {
-    form.date = date; $("#f-date").value = date;
+    form.date = date; $("#f-date").value = date; showDate();
     setShift(s);
     syncExisting(true);
     showView("record");
@@ -1532,7 +1572,9 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   $("#sections").addEventListener("focusin", e => { if (e.target.matches(".stepper input")) e.target.select(); });
   $("#sections").addEventListener("focusout", e => { if (e.target.matches(".stepper input") && e.target.value === "") e.target.value = 0; });
   $("#f-problem").addEventListener("input", saveDraft);
-  $("#f-date").addEventListener("change", e => { form.date = e.target.value; syncExisting(true); });
+  $("#f-date").addEventListener("change", e => { form.date = e.target.value; showDate(); syncExisting(true); });
+  $("#f-date").addEventListener("input", showDate);
+  $("#f-date").addEventListener("click", e => { try { e.target.showPicker(); } catch (_) {} });
   $("#shiftPick").addEventListener("click", e => {
     const b = e.target.closest("button[data-shift]"); if (!b) return;
     setShift(b.dataset.shift); syncExisting(true);
@@ -1685,7 +1727,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   ecgPath();
   tick(); setInterval(tick, 15000);
   const t = defaultTarget();
-  form.date = t.date; $("#f-date").value = t.date; setShift(t.shift);
+  form.date = t.date; $("#f-date").value = t.date; showDate(); setShift(t.shift);
   syncExisting(true);
   updateChecks();
   rebuild();
