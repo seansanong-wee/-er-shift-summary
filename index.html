@@ -898,7 +898,7 @@ table.mini td, table.mini th { padding: 7px 8px; }
   const QI = [
     { k: "revisit", l: "Revisit ภายใน 24 ชม.", sub: "ต่อผู้ป่วยทั้งหมด", target: 2, dir: "max",
       num: L => sum(L, "revisit"), den: L => sum(L, "total") },
-    { k: "refer", l: "อัตรา Refer", sub: "ต่อผู้ป่วยทั้งหมด", target: 50, dir: "max",
+    { k: "refer", l: "อัตรา Refer", sub: "ต่อผู้ป่วยทั้งหมด", target: 5, dir: "max",
       num: L => sum(L, "refer"), den: L => sum(L, "total") },
     { k: "dead", l: "เสียชีวิตใน ER", sub: "ต่อผู้ป่วยทั้งหมด", target: 0.5, dir: "max",
       num: L => sum(L, "dead"), den: L => sum(L, "total") },
