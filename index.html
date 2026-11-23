@@ -231,7 +231,8 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
 .range-label b { color: var(--ink); font-weight: 600; }
 
 /* KPI tiles */
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: 12px; }
+@media (max-width: 420px) { .kpis { grid-template-columns: 1fr 1fr; gap: 8px; } .kpi { padding: 12px 12px 10px; } }
 .kpi {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 15px 17px 13px;
   display: grid; gap: 4px; position: relative; overflow: hidden; min-width: 0; box-shadow: var(--shadow);
@@ -260,7 +261,8 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
 .grid-2 { display: grid; grid-template-columns: 1.65fr 1fr; gap: 18px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .grid-2.even { grid-template-columns: 1fr 1fr; }
-@media (max-width: 1040px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+@media (max-width: 1040px) { .grid-2, .grid-2.even, .grid-3 { grid-template-columns: 1fr; } }
+.grid-2 > *, .grid-3 > * { min-width: 0; }
 
 /* charts */
 .chart { width: 100%; position: relative; }
@@ -501,6 +503,68 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
 .stat { transition: border-color .15s, transform .15s; }
 .stat:hover { border-color: color-mix(in oklab, var(--moph) 40%, var(--line)); transform: translateY(-1px); }
 .stat b { background: linear-gradient(180deg, var(--ink), var(--moph)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* KPI vs last year + stat sparklines */
+.kpi-yoy { font-size: 11.5px; color: var(--muted); }
+.kpi.hero .kpi-yoy { color: rgba(255,255,255,.82); }
+.stat svg.spark { width: 100%; height: 22px; display: block; margin-top: 4px; }
+
+/* quality indicators */
+.qi { display: grid; }
+.qi-row { display: grid; grid-template-columns: 1fr auto auto; gap: 6px 12px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); }
+.qi-row:first-child { border-top: 0; padding-top: 0; }
+.qi-name { font-size: 14px; font-weight: 600; line-height: 1.35; }
+.qi-name small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.qi-val { font-family: var(--f-display); font-size: 22px; font-weight: 700; text-align: right; min-width: 64px; }
+.qi-meter { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--panel-2); position: relative; }
+.qi-meter > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+.qi-meter > b { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink-2); border-radius: 1px; }
+.qi-foot { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+
+/* problem categories + tags */
+.cat-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.cat-bar button { appearance: none; cursor: pointer; border: 1px solid var(--line-2); background: var(--panel); border-radius: 999px; padding: 3px 11px; font-size: 12.5px; color: var(--ink-2); }
+.cat-bar button b { font-family: var(--f-mono); margin-left: 4px; color: var(--ink); }
+.cat-bar button[aria-pressed="true"] { background: var(--accent-wash); border-color: var(--accent); color: var(--ink); font-weight: 600; }
+.tag { display: inline-flex; padding: 0 7px; border-radius: 6px; font-size: 11px; font-weight: 600; background: var(--accent-wash); color: var(--moph); margin: 0 4px 3px 0; }
+.chip.warn { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 45%, transparent); background: color-mix(in oklab, var(--warn) 10%, transparent); }
+.link-btn { appearance: none; border: 0; background: none; padding: 0; color: var(--moph); font-weight: 600; cursor: pointer; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.muted-txt { color: var(--muted); }
+
+/* staff workload */
+table.mini { min-width: 0; font-size: 13px; }
+table.mini th { position: static; }
+table.mini td, table.mini th { padding: 7px 8px; }
+.shift-mini { display: inline-flex; gap: 1px; height: 8px; border-radius: 3px; overflow: hidden; vertical-align: middle; background: var(--panel-2); }
+.staff-more { margin-top: 10px; }
+
+/* history tools */
+.input.sm { padding: 7px 12px; font-size: 13.5px; width: min(300px, 100%); border-radius: 10px; }
+
+/* printable report — hidden on screen, the only thing printed */
+.report { display: none; }
+.report h1 { font-family: var(--f-display); font-size: 17pt; margin: 0 0 2pt; color: #0a5a30; }
+.report h2 { font-family: var(--f-display); font-size: 12.5pt; margin: 14pt 0 5pt; padding-bottom: 2pt; border-bottom: 1.5pt solid #0a8a46; break-after: avoid; }
+.report .rp-meta { font-size: 10pt; color: #333; }
+.report table { min-width: 0; width: 100%; border-collapse: collapse; font-size: 10pt; }
+.report th, .report td { border: 0.6pt solid #9aa; padding: 3pt 6pt; position: static; color: #000; font-size: 10pt; letter-spacing: 0; white-space: normal; }
+.report th { background: #e6f2ea; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: 600; }
+.report td.n, .report th.n { text-align: right; font-family: var(--f-mono); }
+.report tr { break-inside: avoid; }
+.report .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt; }
+.report .cols h2 { margin-top: 10pt; }
+.report .pass { color: #0a7a0a; font-weight: 600; }
+.report .fail { color: #b00020; font-weight: 600; }
+.report .near { color: #8a5a00; font-weight: 600; }
+.report .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 24pt; margin-top: 30pt; text-align: center; font-size: 10.5pt; break-inside: avoid; }
+.report .sign div { padding-top: 26pt; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  html, body { background: #fff !important; }
+  body::before, body::after { display: none !important; }
+  body > *:not(.report) { display: none !important; }
+  .report { display: block; color: #000; font-family: var(--f-body); font-size: 10.5pt; line-height: 1.45; }
+}
+
 .view > * { animation: rise .5s cubic-bezier(.2,.7,.2,1) both; }
 .view > *:nth-child(2) { animation-delay: .04s; } .view > *:nth-child(3) { animation-delay: .08s; }
 .view > *:nth-child(4) { animation-delay: .12s; } .view > *:nth-child(5) { animation-delay: .16s; }
@@ -567,6 +631,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
         </span>
         <span class="range-label" id="rangeLabel"></span>
         <button type="button" class="sync-chip" id="syncChip" data-state="idle" title="ดูสถานะการเชื่อมต่อ Google Sheets"><span class="dot"></span><span id="syncChipText">Google Forms</span></button>
+        <button type="button" class="btn sm" id="printBtn" title="พิมพ์หรือบันทึกเป็น PDF สรุปตามช่วงเวลาที่เลือก">พิมพ์รายงาน / PDF</button>
       </div>
     </div>
 
@@ -585,6 +650,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
             <span><i style="background:var(--s-n)"></i>ดึก</span>
             <span><i style="background:var(--s-m)"></i>เช้า</span>
             <span><i style="background:var(--s-a)"></i>บ่าย</span>
+            <span id="lyLegend" hidden><i style="background:none;border-top:2px dashed var(--ink-2);border-radius:0;height:0"></i>ช่วงเดียวกันปีก่อน</span>
           </div>
         </div>
         <div class="chart" id="trend"></div>
@@ -602,17 +668,17 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
 
     <div class="grid-2 even">
       <div class="panel">
-        <div class="panel-head"><div><h2>การจำหน่ายผู้ป่วย</h2><div class="hint">สัดส่วนจากยอดรวมในช่วงที่เลือก</div></div></div>
-        <div class="hbars" id="dispo"></div>
+        <div class="panel-head"><div><h2>ตัวชี้วัดคุณภาพ</h2><div class="hint">เทียบเกณฑ์เป้าหมาย · ขีดตั้งบนแถบ = เป้าหมาย</div></div></div>
+        <div class="qi" id="quality"></div>
       </div>
       <div class="panel">
-        <div class="panel-head"><div><h2>ภาระงานตามวันและเวร</h2><div class="hint">ค่าเฉลี่ยผู้ป่วยต่อเวร · สีเข้ม = มาก</div></div></div>
-        <div id="heat"></div>
+        <div class="panel-head"><div><h2>การจำหน่ายผู้ป่วย</h2><div class="hint">สัดส่วนจากยอดรวมในช่วงที่เลือก</div></div></div>
+        <div class="hbars" id="dispo"></div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-head"><div><h2>ความครบถ้วนของบันทึก</h2><div class="hint">เวรที่ผ่านไปแล้วแต่ยังไม่มีสรุป</div></div></div>
+      <div class="panel-head"><div><h2>ความครบถ้วนและความถูกต้องของบันทึก</h2><div class="hint">เวรที่ผ่านไปแล้วแต่ยังไม่มีสรุป และเวรที่ยอด Triage หรือการจำหน่ายไม่ตรงกับยอดรวม</div></div></div>
       <div id="complete"></div>
     </div>
 
@@ -626,7 +692,22 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       </div>
       <div class="panel">
         <div class="panel-head"><div><h2>ปัญหาที่เกิดในเวร</h2><div class="hint" id="probHint">ล่าสุดในช่วงที่เลือก</div></div></div>
+        <div class="cat-bar" id="probCats"></div>
         <div class="feed" id="problems"></div>
+      </div>
+    </div>
+
+    <div class="grid-2 even">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>ภาระงานรายบุคคล</h2><div class="hint">จำนวนเวรและผู้ป่วยในเวรที่ขึ้นปฏิบัติงาน ช่วงที่เลือก</div></div>
+          <select class="sel" id="staffRole" aria-label="ตำแหน่ง"></select>
+        </div>
+        <div id="staffLoad"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>ภาระงานตามวันและเวร</h2><div class="hint">ค่าเฉลี่ยผู้ป่วยต่อเวร · สีเข้ม = มาก</div></div></div>
+        <div id="heat"></div>
       </div>
     </div>
   </section>
@@ -705,9 +786,11 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <label class="range-label" for="histMonth">เดือน</label>
         <select class="sel" id="histMonth"></select>
+        <select class="sel" id="histFilter" aria-label="กรองเวร"></select>
+        <input class="input sm" id="histSearch" type="search" placeholder="ค้นหาชื่อเจ้าหน้าที่ หรือคำในปัญหา" aria-label="ค้นหา">
         <span class="range-label" id="histSummary"></span>
       </div>
-      <button class="btn sm" type="button" id="exportBtn" hidden>ดาวน์โหลด CSV ของเดือนนี้</button>
+      <button class="btn sm" type="button" id="exportBtn" hidden>ดาวน์โหลด CSV</button>
     </div>
     <div class="panel" style="padding:0;overflow:hidden">
       <div class="table-wrap" style="border:0;border-radius:0">
@@ -749,6 +832,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   <div><b id="noticeTitle"></b><span class="sub" id="noticeSub"></span></div>
 </div>
+<section class="report" id="report" aria-hidden="true"></section>
 
 <script>
 (() => {
@@ -807,6 +891,57 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   const TH_DOW = ["อา.","จ.","อ.","พ.","พฤ.","ศ.","ส."];
   const DOW_ORDER = [1,2,3,4,5,6,0];
 
+  /* ---------- ตัวชี้วัดคุณภาพ ----------
+     ผู้ดูแล: ปรับเกณฑ์เป้าหมายได้ที่ target (หน่วย %)
+     dir "max" = ไม่ควรเกินเป้า · dir "min" = ไม่ควรต่ำกว่าเป้า
+     ระดับ "ใกล้เกณฑ์" = เลยเป้าไม่เกิน 25% (max) หรือต่ำกว่าเป้าไม่เกิน 20% (min) */
+  const QI = [
+    { k: "revisit", l: "Revisit ภายใน 24 ชม.", sub: "ต่อผู้ป่วยทั้งหมด", target: 2, dir: "max",
+      num: L => sum(L, "revisit"), den: L => sum(L, "total") },
+    { k: "refer", l: "อัตรา Refer", sub: "ต่อผู้ป่วยทั้งหมด", target: 5, dir: "max",
+      num: L => sum(L, "refer"), den: L => sum(L, "total") },
+    { k: "dead", l: "เสียชีวิตใน ER", sub: "ต่อผู้ป่วยทั้งหมด", target: 0.5, dir: "max",
+      num: L => sum(L, "dead"), den: L => sum(L, "total") },
+    { k: "rosc", l: "CPR สำเร็จ (ROSC)", sub: "ต่อการทำ CPR ทั้งหมด", target: 50, dir: "min",
+      num: L => sum(L, "cprOk"), den: L => sum(L, "cprOk") + sum(L, "cprDead") },
+    { k: "data", l: "บันทึกยอดตรงกัน", sub: "เวรที่ Triage และการจำหน่ายรวมได้เท่ายอดรวม", target: 95, dir: "min", unit: "เวร",
+      num: L => L.filter(r => !mismatch(r).length).length, den: L => L.length },
+  ];
+
+  /* ---------- หมวดปัญหาในเวร (จัดหมวดอัตโนมัติจากคำในข้อความ · 1 เวรอยู่ได้หลายหมวด) ---------- */
+  const NO_PROBLEM = /^(ไม่มี(ปัญหา)?|ไม่พบ(ปัญหา)?|ปกติ|เรียบร้อย|-+|–|—|\.+|n\/?a|none|no|nil)\s*[.!]?$/i;
+  const hasProblem = r => { const s = String(r.problem || "").trim(); return !!s && !NO_PROBLEM.test(s); };
+  const PROB_CATS = [
+    { k: "bed", l: "เตียง/ห้องเต็ม", re: /(?<!ตก)เตียง|ล้น|แออัด|รอ\s*admit|รอขึ้น(ตึก|วอร์ด|ward)|(ward|วอร์ด|ตึก|ห้อง)\s*เต็ม/i },
+    { k: "staff", l: "อัตรากำลัง", re: /คนไม่พอ|ขาดคน|อัตรากำลัง|กำลังคน|(พยาบาล|เจ้าหน้าที่|จนท\.?)\s*ไม่พอ|ไม่พอ\s*(คน|พยาบาล|เจ้าหน้าที่)|ลาป่วย|ขึ้นเวรแทน|เวรว่าง/i },
+    { k: "equip", l: "เครื่องมือ/อุปกรณ์", re: /เครื่อง(?!พิมพ์)|อุปกรณ์|ชำรุด|ขัดข้อง|ใช้งานไม่ได้|ใช้ไม่ได้|monitor|defib|ventilator|suction|ออกซิเจน|\bo2\b/i },
+    { k: "it", l: "ระบบ IT/ไฟฟ้า", re: /ระบบ(คอม|ล่ม|ช้า)|คอม|hosxp|อินเทอร์เน็ต|อินเตอร์เน็ต|เน็ต|wi-?fi|ไฟดับ|ไฟฟ้า|ปริ้น|printer|เครื่องพิมพ์|ล่ม/i },
+    { k: "coord", l: "ประสานงาน/ส่งต่อ", re: /ประสาน|ส่งต่อ|refer|ไม่รับ(ผู้ป่วย|ตัว|เคส|case)?|ติดต่อไม่ได้|โทรไม่ติด|consult|ปรึกษา/i },
+    { k: "doc", l: "แพทย์", re: /แพทย์|หมอ(?!น)|ตามแพทย์/i },
+    { k: "conflict", l: "ผู้ป่วย/ญาติ/ความรุนแรง", re: /ญาติ|ร้องเรียน|ทะเลาะ|เมา|ก้าวร้าว|อาละวาด|ความรุนแรง|ทำร้าย|ด่า|ข่มขู่|ตำรวจ/i },
+    { k: "drug", l: "ยา/เวชภัณฑ์", re: /ขาดยา|ยาหมด|ยาไม่พอ|ยาไม่มี|เบิกยา|คลังยา|เวชภัณฑ์|ของหมด|หมดสต็อก|ขาดแคลน|เลือดไม่พอ|ขอเลือด/i },
+    { k: "risk", l: "ความเสี่ยง/อุบัติการณ์", re: /ความเสี่ยง|อุบัติการณ์|ผิดพลาด|ผิดคน|คลาดเคลื่อน|ตกเตียง|พลัดตก|ล่าช้า|ให้ยาผิด/i },
+  ];
+  const OTHER_CAT = { k: "other", l: "อื่น ๆ" };
+  const ALL_CATS = [...PROB_CATS, OTHER_CAT];
+  function probCats(r) {
+    const s = String(r.problem || "");
+    const hit = PROB_CATS.filter(c => c.re.test(s));
+    return hit.length ? hit : [OTHER_CAT];
+  }
+  const tagsHtml = r => probCats(r).map(c => `<span class="tag">${c.l}</span>`).join("");
+
+  /* ยอด Triage / การจำหน่าย เทียบยอดรวมของเวร */
+  function mismatch(r) {
+    const t = Number(r.total) || 0, out = [];
+    const tri = TRIAGE.reduce((a, x) => a + (Number(r[x.k]) || 0), 0);
+    const dis = DISPO.reduce((a, x) => a + (Number(r[x.k]) || 0), 0);
+    if (tri !== t) out.push(`Triage ${tri}/${t}`);
+    if (dis !== t) out.push(`จำหน่าย ${dis}/${t}`);
+    return out;
+  }
+  const splitNames = v => String(v || "").split(/[,，、\n]+/).map(x => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+
   /* ---------- helpers ---------- */
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -815,6 +950,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const parseISO = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const addYears = (d, n) => new Date(d.getFullYear() + n, d.getMonth(), d.getDate());
   const be2 = y => String(y + 543).slice(-2);
   const fmtDate = s => { const d = parseISO(s); return `${d.getDate()} ${TH_MONTH[d.getMonth()]} ${be2(d.getFullYear())}`; };
   const fmtDateLong = s => { const d = parseISO(s); return `${TH_DOW[d.getDay()]} ${d.getDate()} ${TH_MONTH[d.getMonth()]} ${d.getFullYear() + 543}`; };
@@ -1143,16 +1279,33 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     const list = inRange(start, end);
     const days = Math.round((end - start) / 864e5) + 1;
     const prev = inRange(addDays(start, -days), addDays(start, -1));
+    const ly = inRange(addYears(start, -1), addYears(end, -1));
     $("#rangeLabel").innerHTML = `<b>${label}</b> · ${fmtDate(iso(start))} – ${fmtDate(iso(end))} · ${fmtN(list.length)} เวร`;
 
-    renderKpis(list, prev, start, end);
-    renderTrend(list, start, end);
+    renderKpis(list, prev, ly, start, end);
+    renderTrend(list, start, end, ly);
     renderTriage(list);
+    renderQuality(list, prev, ly);
     renderDispo(list);
     renderHeat(list);
-    renderComplete(start, end);
-    renderStats(list);
+    renderComplete(start, end, list);
+    renderStats(list, start, end);
     renderProblems(list);
+    renderStaff(list);
+  }
+  function dailyOf(list, k, start, end) {
+    const m = new Map();
+    for (let d = new Date(start); d <= end; d = addDays(d, 1)) m.set(iso(d), 0);
+    for (const r of list) if (m.has(r.date)) m.set(r.date, m.get(r.date) + (Number(r[k]) || 0));
+    return [...m.values()];
+  }
+  // one line comparing with the same dates last year; empty when last year has no records
+  function yoy(cur, lyVal, lyList, shown) {
+    if (!lyList.length) return "";
+    if (!lyVal) return `<div class="kpi-yoy">ปีก่อน ${shown}</div>`;
+    const d = (cur - lyVal) / lyVal * 100;
+    const txt = Math.abs(d) < 0.05 ? "เท่ากับ" : `${d > 0 ? "▲" : "▼"} ${Math.abs(d).toFixed(1)}% เทียบ`;
+    return `<div class="kpi-yoy">${txt}ปีก่อน (${shown})</div>`;
   }
 
   function dailyTotals(list, start, end) {
@@ -1181,38 +1334,77 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     return `<span class="${d > 0 ? "up" : "down"}">${d > 0 ? "▲" : "▼"} ${Math.abs(d).toFixed(1)}%</span> เทียบช่วงก่อนหน้า${unit}`;
   }
 
-  function renderKpis(list, prev, start, end) {
-    const total = sum(list, "total"), pTotal = sum(prev, "total");
+  function renderKpis(list, prev, ly, start, end) {
+    const total = sum(list, "total"), pTotal = sum(prev, "total"), lTotal = sum(ly, "total");
     const perShift = list.length ? total / list.length : 0;
     const pPerShift = prev.length ? pTotal / prev.length : 0;
+    const lPerShift = ly.length ? lTotal / ly.length : 0;
     const admit = sum(list, "admit"), refer = sum(list, "refer");
     const crit = sum(list, "resus") + sum(list, "emerg");
+    const lCrit = sum(ly, "resus") + sum(ly, "emerg");
     const cprOk = sum(list, "cprOk"), cprDead = sum(list, "cprDead");
     const revisit = sum(list, "revisit");
     const dead = sum(list, "dead");
+    const rn = sum(list, "rn");
     const accent = "#ffffff";
     const t1 = cssVar("--t1") || "#d63a3a";
+    const seq = cssVar("--seq") || "#0a8a46";
     const dt = dailyTotals(list, start, end);
+    const Y = (k, cur) => yoy(cur, sum(ly, k), ly, fmtN(sum(ly, k)));
     const tiles = [
-      { cls: "hero", label: "ผู้ป่วยทั้งหมด", value: fmtN(total), unit: "ราย", sub: delta(total, pTotal), spark: spark(dt, accent) },
-      { label: "เฉลี่ยต่อเวร", value: perShift.toFixed(1), unit: "ราย/เวร", sub: delta(perShift, pPerShift) },
-      { label: "Admit", value: fmtN(admit), unit: "ราย", sub: `อัตรา Admit <b>${fmtP(admit, total)}</b>` },
-      { label: "Refer", value: fmtN(refer), unit: "ราย", sub: `${fmtP(refer, total)} ของผู้ป่วยทั้งหมด` },
-      { label: `<span class="dot" style="background:var(--t1)"></span>Resus + Emergency`, value: fmtN(crit), unit: "ราย", sub: `${fmtP(crit, total)} เป็นผู้ป่วยวิกฤต/ฉุกเฉิน`, spark: spark(dailyTotals(list.map(r => ({ ...r, total: (+r.resus || 0) + (+r.emerg || 0) })), start, end), t1) },
+      { cls: "hero", label: "ผู้ป่วยทั้งหมด", value: fmtN(total), unit: "ราย", sub: delta(total, pTotal),
+        yoy: ly.length ? yoy(total, lTotal, ly, fmtN(lTotal) + " ราย") : `<div class="kpi-yoy">ยังไม่มีข้อมูลช่วงเดียวกันของปีก่อน</div>`, spark: spark(dt, accent) },
+      { label: "เฉลี่ยต่อเวร", value: perShift.toFixed(1), unit: "ราย/เวร", sub: delta(perShift, pPerShift), yoy: yoy(perShift, lPerShift, ly, lPerShift.toFixed(1)) },
+      { label: "ตรวจโดย RN", value: fmtN(rn), unit: "ราย", sub: `${fmtP(rn, total)} ของผู้ป่วยทั้งหมด`, yoy: Y("rn", rn), spark: spark(dailyOf(list, "rn", start, end), seq) },
+      { label: "Admit", value: fmtN(admit), unit: "ราย", sub: `อัตรา Admit <b>${fmtP(admit, total)}</b>`, yoy: Y("admit", admit) },
+      { label: "Refer", value: fmtN(refer), unit: "ราย", sub: `${fmtP(refer, total)} ของผู้ป่วยทั้งหมด`, yoy: Y("refer", refer) },
+      { label: `<span class="dot" style="background:var(--t1)"></span>Resus + Emergency`, value: fmtN(crit), unit: "ราย", sub: `${fmtP(crit, total)} เป็นผู้ป่วยวิกฤต/ฉุกเฉิน`, yoy: yoy(crit, lCrit, ly, fmtN(lCrit)), spark: spark(dailyTotals(list.map(r => ({ ...r, total: (+r.resus || 0) + (+r.emerg || 0) })), start, end), t1) },
       { label: "CPR", value: fmtN(cprOk + cprDead), unit: "ครั้ง", sub: cprOk + cprDead ? `ROSC สำเร็จ ${cprOk} · เสียชีวิต ${cprDead}` : "ไม่มี CPR ในช่วงนี้" },
-      { label: "Revisit ใน 24 ชม.", value: fmtN(revisit), unit: "ราย", sub: `${fmtP(revisit, total)} ของผู้ป่วยทั้งหมด` },
-      { label: "เสียชีวิตใน ER", value: fmtN(dead), unit: "ราย", sub: `D/W ${fmtN(sum(list, "dw"))} · ไม่สมัครใจ ${fmtN(sum(list, "refuse"))}` },
+      { label: "Revisit ใน 24 ชม.", value: fmtN(revisit), unit: "ราย", sub: `${fmtP(revisit, total)} ของผู้ป่วยทั้งหมด`, yoy: Y("revisit", revisit) },
+      { label: "เสียชีวิตใน ER", value: fmtN(dead), unit: "ราย", sub: `D/W ${fmtN(sum(list, "dw"))} · ไม่สมัครใจ ${fmtN(sum(list, "refuse"))}`, yoy: Y("dead", dead) },
     ];
     $("#kpis").innerHTML = tiles.map(t => `
       <div class="kpi ${t.cls || ""}">
         <div class="kpi-label">${t.label}</div>
         <div class="kpi-value">${t.value}<span class="unit">${t.unit}</span></div>
         <div class="kpi-sub">${t.sub}</div>
+        ${t.yoy || ""}
         ${t.spark || ""}
       </div>`).join("");
   }
 
-  function renderTrend(list, start, end) {
+  /* ---------- quality indicators ---------- */
+  function qiValue(q, L) { const d = q.den(L); return d ? q.num(L) / d * 100 : null; }
+  function qiStatus(q, v) {
+    if (v == null) return "";
+    if (q.dir === "max") return v <= q.target ? "ok" : v <= q.target * 1.25 ? "warn" : "crit";
+    return v >= q.target ? "ok" : v >= q.target * 0.8 ? "warn" : "crit";
+  }
+  const QI_LABEL = { ok: "ผ่านเกณฑ์", warn: "ใกล้เกณฑ์", crit: "ไม่ผ่านเกณฑ์", "": "ไม่มีข้อมูล" };
+  const fmtPct = v => v == null ? "–" : v.toFixed(1) + "%";
+  function renderQuality(list, prev, ly) {
+    const el = $("#quality");
+    if (!list.length) { el.innerHTML = `<div class="empty">ยังไม่มีข้อมูลในช่วงนี้</div>`; return; }
+    el.innerHTML = QI.map(q => {
+      const v = qiValue(q, list), p = qiValue(q, prev), l = ly.length ? qiValue(q, ly) : null;
+      const st = qiStatus(q, v);
+      const scale = q.dir === "max" ? Math.max(q.target * 2, (v || 0) * 1.1) : 100;
+      const fill = v == null ? 0 : Math.min(100, v / scale * 100);
+      const mark = Math.min(100, q.target / scale * 100);
+      const color = st === "ok" ? "var(--good)" : st === "warn" ? "var(--warn)" : "var(--crit)";
+      const foot = [`${fmtN(q.num(list))}/${fmtN(q.den(list))} ${q.unit || "ราย"}`, `ช่วงก่อนหน้า ${fmtPct(p)}`];
+      if (l != null) foot.push(`ปีก่อน ${fmtPct(l)}`);
+      return `<div class="qi-row">
+        <div class="qi-name">${q.l}<small>${q.sub} · เป้าหมาย ${q.dir === "max" ? "ไม่เกิน" : "อย่างน้อย"} ${q.target}%</small></div>
+        <span class="status ${st}">${QI_LABEL[st]}</span>
+        <div class="qi-val">${fmtPct(v)}</div>
+        <div class="qi-meter" title="ค่าจริง ${fmtPct(v)} · เป้าหมาย ${q.target}%"><i style="width:${fill.toFixed(1)}%;background:${color}"></i><b style="left:${mark.toFixed(1)}%"></b></div>
+        <div class="qi-foot">${foot.join(" · ")}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderTrend(list, start, end, ly = []) {
     const el = $("#trend");
     const days = Math.round((end - start) / 864e5) + 1;
     const weekly = days > 62;
@@ -1233,13 +1425,18 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       }
     }
     for (const r of list) { const b = idx.get(r.date); if (b) { b[r.s] += Number(r.total) || 0; b.cnt++; } }
+    // same dates last year, shifted forward one year onto this range's buckets
+    let hasLy = false;
+    for (const b of buckets) b.ly = 0;
+    for (const r of ly) { const b = idx.get(iso(addYears(parseISO(r.date), 1))); if (b) { b.ly += Number(r.total) || 0; hasLy = true; } }
+    $("#lyLegend").hidden = !hasLy || !list.length;
     $("#trendHint").textContent = weekly ? "จำนวนผู้ป่วยรวมรายสัปดาห์ (จันทร์–อาทิตย์) ซ้อนตามเวร" : "จำนวนผู้ป่วยทั้งหมดในแต่ละวัน ซ้อนตามเวร";
     if (!list.length) { el.innerHTML = `<div class="empty">ยังไม่มีบันทึกเวรในช่วงนี้ · เพิ่มได้ที่แท็บ “บันทึกเวร”</div>`; return; }
 
     const W = Math.max(300, el.clientWidth || 640), H = 250;
     const pl = 34, pr = 6, pt = 10, pb = 26;
     const iw = W - pl - pr, ih = H - pt - pb;
-    const max = niceMax(Math.max(1, ...buckets.map(b => b.n + b.m + b.a)));
+    const max = niceMax(Math.max(1, ...buckets.map(b => Math.max(b.n + b.m + b.a, b.ly))));
     const bw = iw / buckets.length;
     const barW = Math.max(2, Math.min(26, bw * 0.7));
     const y = v => pt + ih - (v / max) * ih;
@@ -1269,6 +1466,10 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       }
       s += `<rect class="hit" data-i="${i}" x="${pl + bw * i}" y="${pt}" width="${bw}" height="${ih}" fill="transparent"></rect>`;
     });
+    if (hasLy) {
+      const pts = buckets.map((b, i) => `${(pl + bw * i + bw / 2).toFixed(1)},${y(b.ly).toFixed(1)}`).join(" ");
+      s += `<polyline points="${pts}" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-dasharray="4 3" stroke-linejoin="round" opacity="0.8" pointer-events="none"></polyline>`;
+    }
     s += `<line id="trendCursor" x1="0" x2="0" y1="${pt}" y2="${pt + ih}" stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="3 3" opacity="0"></line>`;
     s += `</svg>`;
     el.innerHTML = s;
@@ -1283,7 +1484,8 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       const title = weekly ? `${fmtDate(b.from)} – ${fmtDate(b.to)}` : fmtDateLong(b.from);
       showTip(`<div style="margin-bottom:4px;opacity:.8">${title}</div>` +
         SHIFTS.map(sh => `<div class="row"><span><i class="dot" style="background:var(--s-${sh.c})"></i>${sh.l}</span><b>${b[sh.c]}</b></div>`).join("") +
-        `<div class="row" style="margin-top:4px;border-top:1px solid rgba(127,127,127,.35);padding-top:4px"><span>รวม · ${b.cnt} เวร</span><b>${tot}</b></div>`, e.clientX, e.clientY);
+        `<div class="row" style="margin-top:4px;border-top:1px solid rgba(127,127,127,.35);padding-top:4px"><span>รวม · ${b.cnt} เวร</span><b>${tot}</b></div>` +
+        (hasLy ? `<div class="row" style="opacity:.8"><span>ปีก่อน</span><b>${b.ly}</b></div>` : ""), e.clientX, e.clientY);
     };
     el.onmouseleave = () => { hideTip(); cursor.setAttribute("opacity", 0); };
   }
@@ -1351,8 +1553,7 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     grid.onmouseleave = hideTip;
   }
 
-  function renderComplete(start, end) {
-    const el = $("#complete");
+  function completeness(start, end) {
     const now = new Date();
     const missing = [];
     let expected = 0;
@@ -1364,6 +1565,22 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
         if (!byKey.has(iso(d) + "|" + s.c)) missing.push({ date: iso(d), s: s.c });
       }
     }
+    return { expected, missing };
+  }
+  function renderComplete(start, end, list) {
+    const el = $("#complete");
+    const { expected, missing } = completeness(start, end);
+    const bad = list.map(r => ({ r, mm: mismatch(r) })).filter(x => x.mm.length).reverse();
+    const BAD_MAX = 24;
+    const badHtml = `
+      <div class="missing-head" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px">
+        ยอด Triage / การจำหน่ายไม่ตรงกับยอดรวม
+        <span class="status ${bad.length ? "warn" : "ok"}">${bad.length ? `! ${fmtN(bad.length)} เวร` : "✓ ยอดตรงทุกเวร"}</span>
+        ${bad.length ? `<span class="hint">กดที่เวรเพื่อแก้ไข</span>` : ""}
+      </div>
+      ${bad.length ? `<div class="missing-list" style="margin-top:10px">${bad.slice(0, BAD_MAX).map(({ r, mm }) =>
+        `<button type="button" class="chip missing-chip" data-fill="${r.date}|${r.s}" title="แก้ไขเวร${SH[r.s].l} ${fmtDate(r.date)}"><i class="dot" style="background:var(--s-${r.s})"></i>${fmtDate(r.date)} ${SH[r.s].l} <span class="mono">${mm.join(" · ")}</span></button>`).join("")}</div>
+        ${bad.length > BAD_MAX ? `<div style="margin-top:10px"><button type="button" class="link-btn" data-hist="mismatch">ดูทั้งหมด ${fmtN(bad.length)} เวรในแท็บประวัติ</button></div>` : ""}` : ""}`;
     const done = expected - missing.length;
     const pct = expected ? done / expected * 100 : 100;
     const cls = missing.length === 0 ? "ok" : missing.length <= 3 ? "warn" : "crit";
@@ -1389,16 +1606,22 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
             <div class="missing-date">${fmtDateLong(g.date)}</div>
             <div class="missing-list">${g.shifts.map(c => `<button type="button" class="chip missing-chip" data-fill="${g.date}|${c}" title="เปิดฟอร์มบันทึกเวร${SH[c].l} ${fmtDate(g.date)}"><i class="dot" style="background:var(--s-${c})"></i>เวร${SH[c].l} <span class="mono">${SH[c].t}</span></button>`).join("")}</div>
           </div>`).join("")}
-        </div>` : ""}`;
+        </div>` : ""}${badHtml}`;
   }
   $("#complete").addEventListener("click", e => {
+    const h = e.target.closest("[data-hist]"); if (h) return goHistory(h.dataset.hist);
     const b = e.target.closest("[data-fill]"); if (!b) return;
     const [date, s] = b.dataset.fill.split("|");
     openRecord(date, s);
   });
 
-  function renderStats(list) {
-    const stat = (k, l, extra = "") => `<div class="stat"><b>${fmtN(sum(list, k))}</b><span>${l}</span>${extra ? `<em>${extra}</em>` : ""}</div>`;
+  function renderStats(list, start, end) {
+    const seq = cssVar("--seq") || "#0a8a46";
+    // each count carries a small daily trend line for the selected range
+    const stat = (k, l, extra = "") => {
+      const n = sum(list, k);
+      return `<div class="stat" title="${esc(l)}: ${fmtN(n)} ราย · เส้น = แนวโน้มรายวัน"><b>${fmtN(n)}</b><span>${l}</span>${extra ? `<em>${extra}</em>` : ""}${n ? spark(dailyOf(list, k, start, end), seq) : ""}</div>`;
+    };
     const cprOk = sum(list, "cprOk"), cprDead = sum(list, "cprDead");
     $("#critical").innerHTML = [
       stat("stroke", "Stroke fast track"), stat("stemi", "STEMI"), stat("sepsis", "SEPSIS"),
@@ -1412,21 +1635,80 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
       stat("accGen", "อุบัติเหตุทั่วไป"), stat("accTraffic", "อุบัติเหตุจราจร"), stat("legal", "คดี"),
       stat("autopsy", "ชันสูตร"), stat("ems", "ออกเหตุ EMS"), stat("ct", "ส่ง CT"),
       stat("psych", "จิตเวช"),
-      pui ? stat("pui", "PUI", "ปีงบ 2569") : "",
+      pui ? stat("pui", "PUI") : "",
     ].join("");
   }
 
+  let probCat = "";
   function renderProblems(list) {
-    const el = $("#problems");
-    const items = list.filter(r => r.problem && r.problem.trim()).reverse();
-    $("#probHint").textContent = items.length ? `${fmtN(items.length)} เวรที่รายงานปัญหาในช่วงนี้ · แสดงล่าสุด ${Math.min(8, items.length)} รายการ` : "ล่าสุดในช่วงที่เลือก";
-    if (!items.length) { el.innerHTML = `<div class="empty">ไม่มีรายงานปัญหาในช่วงนี้</div>`; return; }
-    el.innerHTML = items.slice(0, 8).map(r => `
+    const el = $("#problems"), bar = $("#probCats");
+    const all = list.filter(hasProblem).reverse();
+    const counts = new Map(ALL_CATS.map(c => [c.k, 0]));
+    for (const r of all) for (const c of probCats(r)) counts.set(c.k, counts.get(c.k) + 1);
+    if (probCat && !counts.get(probCat)) probCat = "";
+    const items = probCat ? all.filter(r => probCats(r).some(c => c.k === probCat)) : all;
+    const SHOW = 8;
+    $("#probHint").textContent = all.length ? `${fmtN(all.length)} เวรที่รายงานปัญหาในช่วงนี้ · แสดงล่าสุด ${Math.min(SHOW, items.length)} รายการ` : "ล่าสุดในช่วงที่เลือก";
+    bar.hidden = !all.length;
+    bar.innerHTML = all.length ? `<button type="button" data-cat="" aria-pressed="${!probCat}">ทั้งหมด<b>${fmtN(all.length)}</b></button>` +
+      ALL_CATS.filter(c => counts.get(c.k)).sort((a, b) => counts.get(b.k) - counts.get(a.k))
+        .map(c => `<button type="button" data-cat="${c.k}" aria-pressed="${probCat === c.k}">${c.l}<b>${fmtN(counts.get(c.k))}</b></button>`).join("") : "";
+    if (!all.length) { el.innerHTML = `<div class="empty">ไม่มีรายงานปัญหาในช่วงนี้</div>`; return; }
+    el.innerHTML = items.slice(0, SHOW).map(r => `
       <div class="feed-item">
         <div class="feed-when"><span>${fmtDate(r.date)}</span><span class="chip"><i class="dot" style="background:var(--s-${r.s})"></i>เวร${SH[r.s].l}</span></div>
-        <div class="feed-text">${esc(r.problem)}<small>หัวหน้าเวร ${esc(r.head || "–")} · ผู้ป่วย ${fmtN(r.total)} ราย</small></div>
-      </div>`).join("");
+        <div class="feed-text"><div>${tagsHtml(r)}</div>${esc(r.problem)}<small>หัวหน้าเวร ${esc(r.head || "–")} · ผู้ป่วย ${fmtN(r.total)} ราย</small></div>
+      </div>`).join("") +
+      (items.length > SHOW ? `<div style="padding-top:10px"><button type="button" class="link-btn" data-hist="${probCat ? "cat:" + probCat : "problem"}">ดูทั้งหมด ${fmtN(items.length)} รายการในแท็บประวัติ</button></div>` : "");
   }
+  $("#probCats").addEventListener("click", e => {
+    const b = e.target.closest("button[data-cat]"); if (!b) return;
+    probCat = b.dataset.cat; renderDashboard();
+  });
+  $("#problems").addEventListener("click", e => {
+    const h = e.target.closest("[data-hist]"); if (h) goHistory(h.dataset.hist);
+  });
+
+  /* ---------- staff workload ---------- */
+  const STAFF_ROLES = STAFF.filter(s => ["head", "nurses", "doctor", "ep"].includes(s.k));
+  let staffRole = store.get("er-staff-role") || "head";
+  let staffAll = false;
+  $("#staffRole").innerHTML = STAFF_ROLES.map(s => `<option value="${s.k}">${s.l}</option>`).join("");
+  $("#staffRole").value = STAFF_ROLES.some(s => s.k === staffRole) ? staffRole : "head";
+  $("#staffRole").addEventListener("change", e => { staffRole = e.target.value; staffAll = false; store.set("er-staff-role", staffRole); renderDashboard(); });
+  function renderStaff(list) {
+    const el = $("#staffLoad");
+    const role = STAFF_ROLES.find(s => s.k === staffRole) || STAFF_ROLES[0];
+    const m = new Map();
+    for (const r of list) for (const n of new Set(splitNames(r[role.k]))) {
+      const o = m.get(n) || { n, cnt: 0, s: { n: 0, m: 0, a: 0 }, pts: 0, crit: 0, cpr: 0 };
+      o.cnt++; o.s[r.s] = (o.s[r.s] || 0) + 1; o.pts += Number(r.total) || 0;
+      o.crit += (Number(r.resus) || 0) + (Number(r.emerg) || 0);
+      o.cpr += (Number(r.cprOk) || 0) + (Number(r.cprDead) || 0);
+      m.set(n, o);
+    }
+    const rows = [...m.values()].sort((a, b) => b.cnt - a.cnt || b.pts - a.pts);
+    if (!rows.length) { el.innerHTML = `<div class="empty">ยังไม่มีชื่อ${role.l}ในช่วงนี้</div>`; return; }
+    const LIMIT = 12, maxCnt = rows[0].cnt;
+    const shown = staffAll ? rows : rows.slice(0, LIMIT);
+    el.innerHTML = `<div class="table-wrap"><table class="mini">
+      <thead><tr><th>ชื่อ</th><th class="n">เวร</th><th>ดึก / เช้า / บ่าย</th><th class="n">ผู้ป่วย</th><th class="n">เฉลี่ย/เวร</th><th class="n">Resus+Emerg</th><th class="n">CPR</th></tr></thead>
+      <tbody>${shown.map(o => `<tr>
+        <td>${esc(o.n)}</td>
+        <td class="n"><b>${fmtN(o.cnt)}</b></td>
+        <td><span class="shift-mini" style="width:${Math.max(18, o.cnt / maxCnt * 90).toFixed(0)}px" title="ดึก ${o.s.n} · เช้า ${o.s.m} · บ่าย ${o.s.a}">${SHIFTS.map(s => o.s[s.c] ? `<span style="flex:${o.s[s.c]};background:var(--s-${s.c})"></span>` : "").join("")}</span>
+          <span class="mono hint" style="margin-left:6px">${o.s.n}/${o.s.m}/${o.s.a}</span></td>
+        <td class="n">${fmtN(o.pts)}</td>
+        <td class="n">${(o.pts / o.cnt).toFixed(1)}</td>
+        <td class="n">${fmtN(o.crit)}</td>
+        <td class="n">${o.cpr || "–"}</td>
+      </tr>`).join("")}</tbody></table></div>
+      <div class="staff-more hint">${fmtN(rows.length)} คน · ชื่อที่สะกดต่างกันจะนับแยกกัน
+        ${rows.length > LIMIT ? ` · <button type="button" class="link-btn" id="staffToggle">${staffAll ? "แสดงเฉพาะ 12 อันดับแรก" : `แสดงทั้งหมด ${fmtN(rows.length)} คน`}</button>` : ""}</div>`;
+  }
+  $("#staffLoad").addEventListener("click", e => {
+    if (e.target.closest("#staffToggle")) { staffAll = !staffAll; renderDashboard(); }
+  });
 
   /* ---------- record form ---------- */
   function buildForm() {
@@ -1623,11 +1905,40 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     const ms = new Set(Object.keys(months).filter(k => Object.keys(months[k] || {}).length));
     const now = new Date(); ms.add(`${now.getFullYear()}-${pad(now.getMonth() + 1)}`);
     const list = [...ms].sort().reverse();
-    if (!histMonth || !ms.has(histMonth)) histMonth = list.find(m => months[m] && Object.keys(months[m]).length) || list[0];
-    sel.innerHTML = list.map(m => { const [y, mo] = m.split("-").map(Number); return `<option value="${m}">${TH_MONTH_FULL[mo - 1]} ${y + 543}</option>`; }).join("");
+    if (!histMonth || (histMonth !== "all" && !ms.has(histMonth))) histMonth = list.find(m => months[m] && Object.keys(months[m]).length) || list[0];
+    sel.innerHTML = `<option value="all">ทุกเดือน</option>` + list.map(m => { const [y, mo] = m.split("-").map(Number); return `<option value="${m}">${TH_MONTH_FULL[mo - 1]} ${y + 543}</option>`; }).join("");
     sel.value = histMonth;
   }
   $("#histMonth").addEventListener("change", e => { histMonth = e.target.value; renderHistory(); });
+  $("#histFilter").innerHTML = `<option value="">ทุกเวร</option>
+    <option value="mismatch">ยอดไม่ตรงยอดรวม</option>
+    <option value="problem">มีปัญหาในเวร</option>
+    <option value="dup">ส่งฟอร์มซ้ำ</option>
+    <optgroup label="หมวดปัญหา">${ALL_CATS.map(c => `<option value="cat:${c.k}">${c.l}</option>`).join("")}</optgroup>`;
+  $("#histFilter").addEventListener("change", () => renderHistory());
+  let searchT;
+  $("#histSearch").addEventListener("input", () => { clearTimeout(searchT); searchT = setTimeout(renderHistory, 150); });
+  // jump from the dashboard to History with a filter applied across all months
+  function goHistory(filter) {
+    histMonth = "all";
+    $("#histFilter").value = filter || "";
+    $("#histSearch").value = "";
+    showView("history");
+    buildHistMonths();
+    renderHistory();
+    $("#histFilter").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  let histShown = [];
+  function histList() {
+    const f = $("#histFilter").value, q = $("#histSearch").value.trim().toLowerCase();
+    let list = histMonth === "all" ? records : records.filter(r => r.date.startsWith(histMonth));
+    if (f === "mismatch") list = list.filter(r => mismatch(r).length);
+    else if (f === "problem") list = list.filter(hasProblem);
+    else if (f === "dup") list = list.filter(r => r.rows && r.rows.length > 1);
+    else if (f.startsWith("cat:")) list = list.filter(r => hasProblem(r) && probCats(r).some(c => c.k === f.slice(4)));
+    if (q) list = list.filter(r => [...STAFF.map(s => r[s.k]), r.problem].join(" ").toLowerCase().includes(q));
+    return { list, filtered: !!(f || q) };
+  }
   let confirmKey = "";
   let flashKey = "";
   // after a save: open History on that month and pulse the saved row
@@ -1643,25 +1954,28 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
   }
   function renderHistory() {
     const body = $("#histBody");
-    const list = records.filter(r => r.date.startsWith(histMonth));
+    const { list, filtered } = histList();
+    histShown = list;
     const total = sum(list, "total");
-    $("#histSummary").textContent = list.length ? `${fmtN(list.length)} เวร · ผู้ป่วย ${fmtN(total)} ราย · เฉลี่ย ${(total / list.length).toFixed(1)} ราย/เวร` : "";
+    $("#histSummary").textContent = list.length ? `${filtered ? "พบ " : ""}${fmtN(list.length)} เวร · ผู้ป่วย ${fmtN(total)} ราย · เฉลี่ย ${(total / list.length).toFixed(1)} ราย/เวร` : "";
     $("#exportBtn").hidden = !downloads || !list.length;
-    if (!list.length) { body.innerHTML = `<tr><td colspan="12"><div class="empty">ยังไม่มีบันทึกในเดือนนี้</div></td></tr>`; return; }
+    $("#exportBtn").textContent = `ดาวน์โหลด CSV (${fmtN(list.length)} เวร)`;
+    if (!list.length) { body.innerHTML = `<tr><td colspan="12"><div class="empty">${filtered ? "ไม่พบเวรที่ตรงกับเงื่อนไข" : "ยังไม่มีบันทึกในเดือนนี้"}</div></td></tr>`; return; }
     body.innerHTML = list.slice().reverse().map(r => {
       const k = r.date + "|" + r.s;
       const tri = TRIAGE.reduce((a, t) => a + (+r[t.k] || 0), 0) || 1;
+      const mm = mismatch(r);
       const confirming = confirmKey === k;
       return `<tr${k === flashKey ? ' class="flash" id="flashRow"' : ""}>
         <td style="white-space:nowrap">${fmtDate(r.date)}${r.rows && r.rows.length > 1 ? `<br><span class="chip" title="เวรนี้ถูกส่งฟอร์มมากกว่า 1 ครั้ง ระบบแสดงคำตอบล่าสุด" style="margin-top:3px">ส่งซ้ำ ${r.rows.length}</span>` : ""}</td>
         <td><span class="chip"><i class="dot" style="background:var(--s-${r.s})"></i>${SH[r.s].l}</span></td>
-        <td class="n"><b>${fmtN(r.total)}</b></td>
+        <td class="n"><b>${fmtN(r.total)}</b>${mm.length ? `<br><span class="chip warn" style="margin:3px 0 0 auto" title="${esc(mm.join(" · "))}">ยอดไม่ตรง</span>` : ""}</td>
         <td><span class="tri-mini" title="${TRIAGE.map(t => `${t.l} ${r[t.k] || 0}`).join(" · ")}">${TRIAGE.map(t => `<span style="flex:${(+r[t.k] || 0) / tri};background:var(${t.v})"></span>`).join("")}</span></td>
         <td class="n">${fmtN(r.admit)}</td><td class="n">${fmtN(r.refer)}</td><td class="n">${fmtN(r.dc)}</td>
         <td class="n">${(+r.cprOk || 0) + (+r.cprDead || 0) || "–"}</td>
         <td>${esc(r.head || "–")}</td>
         <td>${esc(r.doctor || "–")}</td>
-        <td class="prob">${esc(r.problem || "")}</td>
+        <td class="prob">${hasProblem(r) ? `<div>${tagsHtml(r)}</div>${esc(r.problem)}` : `<span class="muted-txt">${esc(r.problem || "")}</span>`}</td>
         <td><div class="row-actions">${confirming
           ? `<button class="btn sm danger" type="button" data-del="${k}">ยืนยันลบ</button><button class="btn sm" type="button" data-cancel>ยกเลิก</button>`
           : `<button class="btn sm" type="button" data-edit="${k}">แก้ไข</button><button class="btn sm danger" type="button" data-ask="${k}">ลบ</button>`}</div></td>
@@ -1690,17 +2004,117 @@ tr.flash td { animation: flash 1.6s ease-out 3; }
     }
   });
   $("#exportBtn").addEventListener("click", () => {
-    const list = records.filter(r => r.date.startsWith(histMonth));
-    const cols = ["date", "s", ...NUM_KEYS, ...STAFF.map(s => s.k), "problem"];
-    const head = ["วันที่", "เวร", ...SECTIONS.flatMap(s => s.fields.map(f => f.l)), ...STAFF.map(s => s.l), "ปัญหาในเวร"];
+    const list = histShown;
+    const cols = ["date", "s", ...NUM_KEYS, ...STAFF.map(s => s.k), "problem", "_cats", "_mm"];
+    const head = ["วันที่", "เวร", ...SECTIONS.flatMap(s => s.fields.map(f => f.l)), ...STAFF.map(s => s.l), "ปัญหาในเวร", "หมวดปัญหา", "ยอดไม่ตรง"];
     const q = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-    const rows = list.map(r => cols.map(c => c === "s" ? SH[r.s].l : c === "date" ? fmtDate(r.date) : (r[c] ?? "")).map(q).join(","));
+    const val = (r, c) => c === "s" ? SH[r.s].l : c === "date" ? fmtDate(r.date)
+      : c === "_cats" ? (hasProblem(r) ? probCats(r).map(x => x.l).join(" / ") : "")
+      : c === "_mm" ? mismatch(r).join(" · ") : (r[c] ?? "");
+    const rows = list.map(r => cols.map(c => val(r, c)).map(q).join(","));
     const csv = "﻿" + [head.map(q).join(","), ...rows].join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    a.download = `สรุปเวรER-${histMonth}.csv`;
+    a.download = `สรุปเวรER-${histMonth === "all" ? "ทุกเดือน" : histMonth}${$("#histFilter").value || $("#histSearch").value.trim() ? "-กรองแล้ว" : ""}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  /* ---------- printable report (current dashboard range) ---------- */
+  function buildReport() {
+    const { start, end, label } = resolveRange();
+    const list = inRange(start, end);
+    const days = Math.round((end - start) / 864e5) + 1;
+    const pStart = addDays(start, -days), pEnd = addDays(start, -1);
+    const prev = inRange(pStart, pEnd);
+    const lStart = addYears(start, -1), lEnd = addYears(end, -1);
+    const ly = inRange(lStart, lEnd);
+    const T = L => sum(L, "total");
+    const pc = (L, k) => `${fmtN(sum(L, k))} <small>(${fmtP(sum(L, k), T(L))})</small>`;
+    const span = (a, b) => `${fmtDate(iso(a))} – ${fmtDate(iso(b))}`;
+    const { expected, missing } = completeness(start, end);
+    const bad = list.filter(r => mismatch(r).length);
+    const nowTxt = new Date().toLocaleString("th-TH", { dateStyle: "long", timeStyle: "short" });
+
+    const cmpCols = [["ช่วงที่รายงาน", list, span(start, end)], ["ช่วงก่อนหน้า", prev, span(pStart, pEnd)]];
+    if (ly.length) cmpCols.push(["ช่วงเดียวกันปีก่อน", ly, span(lStart, lEnd)]);
+    const overview = [
+      ["จำนวนเวรที่บันทึก", L => fmtN(L.length)],
+      ["ผู้ป่วยทั้งหมด (ราย)", L => fmtN(T(L))],
+      ["เฉลี่ยต่อเวร (ราย)", L => L.length ? (T(L) / L.length).toFixed(1) : "–"],
+      ["ตรวจโดย RN", L => pc(L, "rn")],
+      ["Resus + Emergency", L => `${fmtN(sum(L, "resus") + sum(L, "emerg"))} <small>(${fmtP(sum(L, "resus") + sum(L, "emerg"), T(L))})</small>`],
+      ["Admit", L => pc(L, "admit")],
+      ["Refer", L => pc(L, "refer")],
+      ["Revisit ภายใน 24 ชม.", L => pc(L, "revisit")],
+      ["ส่ง CT", L => pc(L, "ct")],
+      ["CPR สำเร็จ / เสียชีวิต", L => `${fmtN(sum(L, "cprOk"))} / ${fmtN(sum(L, "cprDead"))}`],
+      ["เสียชีวิตใน ER", L => pc(L, "dead")],
+    ];
+    const table = (head, rows) => `<table><thead><tr>${head.map((h, i) => `<th${i ? ' class="n"' : ""}>${h}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td${i ? ' class="n"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    const countTable = (title, items) => `<div><h2>${title}</h2>${table(["รายการ", "จำนวน", "ร้อยละ"], items.map(([l, k]) => [l, fmtN(sum(list, k)), fmtP(sum(list, k), T(list))]))}</div>`;
+
+    // by month, when the range spans more than one month
+    const monthKeys = [...new Set(list.map(r => r.date.slice(0, 7)))].sort();
+    const byMonth = monthKeys.length > 1 ? `<h2>สรุปรายเดือน</h2>` + table(["เดือน", "เวร", "ผู้ป่วย", "เฉลี่ย/เวร", "Admit", "Refer", "CPR", "เสียชีวิต"],
+      monthKeys.map(mk => {
+        const L = list.filter(r => r.date.startsWith(mk)); const [y, mo] = mk.split("-").map(Number);
+        return [`${TH_MONTH_FULL[mo - 1]} ${y + 543}`, fmtN(L.length), fmtN(T(L)), (T(L) / L.length).toFixed(1), fmtN(sum(L, "admit")), fmtN(sum(L, "refer")), fmtN(sum(L, "cprOk") + sum(L, "cprDead")), fmtN(sum(L, "dead"))];
+      })) : "";
+
+    const probs = list.filter(hasProblem);
+    const catCount = new Map();
+    for (const r of probs) for (const c of probCats(r)) catCount.set(c.l, (catCount.get(c.l) || 0) + 1);
+    const qiRows = QI.map(q => {
+      const v = qiValue(q, list), st = qiStatus(q, v);
+      const cls = st === "ok" ? "pass" : st === "warn" ? "near" : st === "crit" ? "fail" : "";
+      return [q.l, `${q.dir === "max" ? "≤" : "≥"} ${q.target}%`, fmtPct(v), `<span class="${cls}">${QI_LABEL[st]}</span>`];
+    });
+
+    return `
+      <h1>รายงานสรุปเวร งานอุบัติเหตุและฉุกเฉิน</h1>
+      <div class="rp-meta"><b>${esc(label)}</b> · ${span(start, end)} · พิมพ์เมื่อ ${esc(nowTxt)}</div>
+      <div class="rp-meta">บันทึกแล้ว ${fmtN(expected - missing.length)} จาก ${fmtN(expected)} เวร (${fmtP(expected - missing.length, expected)})
+        · ยอด Triage/การจำหน่ายไม่ตรงยอดรวม ${fmtN(bad.length)} เวร</div>
+
+      <h2>ภาพรวม</h2>
+      ${table(["รายการ", ...cmpCols.map(c => `${c[0]}<br><small style="font-weight:400">${c[2]}</small>`)], overview.map(([l, f]) => [l, ...cmpCols.map(c => f(c[1]))]))}
+
+      <h2>ตัวชี้วัดคุณภาพ</h2>
+      ${table(["ตัวชี้วัด", "เป้าหมาย", "ผลงาน", "ผล"], qiRows)}
+
+      <h2>แยกตามเวร</h2>
+      ${table(["เวร", "จำนวนเวร", "ผู้ป่วย", "เฉลี่ย/เวร", "Resus+Emerg", "Admit", "Refer"], SHIFTS.map(s => {
+        const L = list.filter(r => r.s === s.c);
+        return [`${s.l} (${s.t})`, fmtN(L.length), fmtN(T(L)), L.length ? (T(L) / L.length).toFixed(1) : "–", fmtN(sum(L, "resus") + sum(L, "emerg")), fmtN(sum(L, "admit")), fmtN(sum(L, "refer"))];
+      }))}
+      ${byMonth}
+
+      <div class="cols">
+        ${countTable("คัดกรอง (Triage)", TRIAGE.map(t => [`${t.l} (${t.th})`, t.k]))}
+        ${countTable("การจำหน่าย", DISPO.map(d => [d.l, d.k]))}
+      </div>
+      <div class="cols">
+        ${countTable("Fast track / วิกฤต", SECTIONS.find(s => s.id === "crit").fields.map(f => [f.l, f.k]))}
+        ${countTable("อุบัติเหตุ คดี และงานอื่น", [...SECTIONS.find(s => s.id === "acc").fields.map(f => [f.l, f.k]), ["ส่ง CT", "ct"], ...(sum(list, "pui") ? [["PUI", "pui"]] : [])])}
+      </div>
+
+      <h2>ปัญหาที่เกิดในเวร (${fmtN(probs.length)} เวร)</h2>
+      ${probs.length ? `<div class="rp-meta" style="margin-bottom:6px">${[...catCount].sort((a, b) => b[1] - a[1]).map(([l, n]) => `${l} ${n}`).join(" · ")}</div>
+      <table><thead><tr><th>วันที่</th><th>เวร</th><th>หมวด</th><th>รายละเอียด</th><th>หัวหน้าเวร</th></tr></thead>
+      <tbody>${probs.map(r => `<tr><td style="white-space:nowrap">${fmtDate(r.date)}</td><td>${SH[r.s].l}</td><td>${probCats(r).map(c => c.l).join(", ")}</td><td>${esc(r.problem)}</td><td>${esc(r.head || "–")}</td></tr>`).join("")}</tbody></table>`
+      : `<div class="rp-meta">ไม่มีรายงานปัญหาในช่วงนี้</div>`}
+
+      <div class="sign">
+        <div>ลงชื่อ ......................................................<br>ผู้รายงาน</div>
+        <div>ลงชื่อ ......................................................<br>หัวหน้างานอุบัติเหตุฉุกเฉินและนิติเวช</div>
+      </div>`;
+  }
+  $("#printBtn").addEventListener("click", () => {
+    if (!records.length) return toast("ยังไม่มีข้อมูลสำหรับพิมพ์ · เชื่อมต่อ Google Sheets ก่อน", true);
+    $("#report").innerHTML = buildReport();
+    window.print();
   });
 
   /* ---------- connection ---------- */
