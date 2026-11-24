@@ -674,6 +674,8 @@ table.mini td, table.mini th { padding: 7px 8px; }
       <div class="panel">
         <div class="panel-head"><div><h2>การจำหน่ายผู้ป่วย</h2><div class="hint">สัดส่วนจากยอดรวมในช่วงที่เลือก</div></div></div>
         <div class="hbars" id="dispo"></div>
+        <div class="panel-head" style="margin-top:18px"><div><h2>หัตถการ</h2><div class="hint">ไม่นับรวมในยอดการจำหน่าย · สัดส่วนต่อผู้ป่วยทั้งหมด</div></div></div>
+        <div class="hbars" id="proc"></div>
       </div>
     </div>
 
@@ -854,7 +856,11 @@ table.mini td, table.mini th { padding: 7px 8px; }
   ];
   const DISPO = [
     { k: "dc", l: "จำหน่าย / ทุเลา" }, { k: "admit", l: "Admit" }, { k: "refer", l: "Refer" },
-    { k: "dw", l: "ล้างแผล (D/W)" }, { k: "refuse", l: "ไม่สมัครใจรักษา" }, { k: "dead", l: "Dead" },
+    { k: "refuse", l: "ไม่สมัครใจรักษา" }, { k: "dead", l: "Dead" },
+  ];
+  /* หัตถการ: ไม่นับรวมในยอดการจำหน่าย */
+  const PROC = [
+    { k: "dw", l: "ล้างแผล (D/W)" },
   ];
   const SECTIONS = [
     { id: "ov", title: "ภาพรวมเวร", fields: [
@@ -865,6 +871,7 @@ table.mini td, table.mini th { padding: 7px 8px; }
     ]},
     { id: "tri", title: "คัดกรอง (Triage)", check: "tri", fields: TRIAGE.map(t => ({ k: t.k, l: t.l, sub: t.th, color: t.v })) },
     { id: "dis", title: "การจำหน่าย", check: "dis", fields: DISPO.map(d => ({ k: d.k, l: d.l })) },
+    { id: "proc", title: "หัตถการ", fields: PROC.map(d => ({ k: d.k, l: d.l })) },
     { id: "crit", title: "Fast track / วิกฤต", fields: [
       { k: "stroke", l: "Stroke" }, { k: "stemi", l: "STEMI" }, { k: "sepsis", l: "SEPSIS" },
       { k: "shi", l: "Severe HI" }, { k: "fastKid", l: "Fast track เด็ก" },
@@ -1361,7 +1368,7 @@ table.mini td, table.mini th { padding: 7px 8px; }
       { label: `<span class="dot" style="background:var(--t1)"></span>Resus + Emergency`, value: fmtN(crit), unit: "ราย", sub: `${fmtP(crit, total)} เป็นผู้ป่วยวิกฤต/ฉุกเฉิน`, yoy: yoy(crit, lCrit, ly, fmtN(lCrit)), spark: spark(dailyTotals(list.map(r => ({ ...r, total: (+r.resus || 0) + (+r.emerg || 0) })), start, end), t1) },
       { label: "CPR", value: fmtN(cprOk + cprDead), unit: "ครั้ง", sub: cprOk + cprDead ? `ROSC สำเร็จ ${cprOk} · เสียชีวิต ${cprDead}` : "ไม่มี CPR ในช่วงนี้" },
       { label: "Revisit ใน 24 ชม.", value: fmtN(revisit), unit: "ราย", sub: `${fmtP(revisit, total)} ของผู้ป่วยทั้งหมด`, yoy: Y("revisit", revisit) },
-      { label: "เสียชีวิตใน ER", value: fmtN(dead), unit: "ราย", sub: `D/W ${fmtN(sum(list, "dw"))} · ไม่สมัครใจ ${fmtN(sum(list, "refuse"))}`, yoy: Y("dead", dead) },
+      { label: "เสียชีวิตใน ER", value: fmtN(dead), unit: "ราย", sub: `ไม่สมัครใจรักษา ${fmtN(sum(list, "refuse"))}`, yoy: Y("dead", dead) },
     ];
     $("#kpis").innerHTML = tiles.map(t => `
       <div class="kpi ${t.cls || ""}">
@@ -1510,9 +1517,13 @@ table.mini td, table.mini th { padding: 7px 8px; }
   }
 
   function renderDispo(list) {
-    const el = $("#dispo");
+    hbars($("#dispo"), list, DISPO);
+    hbars($("#proc"), list, PROC);
+  }
+
+  function hbars(el, list, items) {
     const total = sum(list, "total");
-    const vals = DISPO.map(d => ({ ...d, n: sum(list, d.k) }));
+    const vals = items.map(d => ({ ...d, n: sum(list, d.k) }));
     const max = Math.max(1, ...vals.map(v => v.n));
     if (!list.length) { el.innerHTML = `<div class="empty">ยังไม่มีข้อมูล</div>`; return; }
     el.innerHTML = vals.map(v => `
@@ -2093,7 +2104,10 @@ table.mini td, table.mini th { padding: 7px 8px; }
 
       <div class="cols">
         ${countTable("คัดกรอง (Triage)", TRIAGE.map(t => [`${t.l} (${t.th})`, t.k]))}
-        ${countTable("การจำหน่าย", DISPO.map(d => [d.l, d.k]))}
+        <div>
+          ${countTable("การจำหน่าย", DISPO.map(d => [d.l, d.k]))}
+          ${countTable("หัตถการ", PROC.map(d => [d.l, d.k]))}
+        </div>
       </div>
       <div class="cols">
         ${countTable("Fast track / วิกฤต", SECTIONS.find(s => s.id === "crit").fields.map(f => [f.l, f.k]))}
