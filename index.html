@@ -1806,14 +1806,14 @@ table.mini td, table.mini th { padding: 7px 8px; }
       const el = $("#chk-" + id);
       const diff = v - r.total;
       const ok = diff === 0;
-      el.className = "status " + (ok ? "ok" : "warn");
+      el.className = "status " + (ok ? "ok" : "warn blink");
       el.textContent = ok ? `✓ รวม ${v} ตรงกับยอดรวม` : `! รวม ${v} ${diff > 0 ? "เกิน" : "ขาด"}ยอดรวม ${Math.abs(diff)}`;
       return { ok, v };
     };
     const a = set("tri", tri), b = set("dis", dis);
     $("#sbTotal").textContent = r.total;
-    $("#sbTri").innerHTML = `<span class="status ${a.ok ? "ok" : "warn"}">${a.ok ? "✓" : "!"} Triage ${tri}</span>`;
-    $("#sbDis").innerHTML = `<span class="status ${b.ok ? "ok" : "warn"}">${b.ok ? "✓" : "!"} จำหน่าย ${dis}</span>`;
+    $("#sbTri").innerHTML = `<span class="status ${a.ok ? "ok" : "warn blink"}">${a.ok ? "✓" : "!"} Triage ${tri}</span>`;
+    $("#sbDis").innerHTML = `<span class="status ${b.ok ? "ok" : "warn blink"}">${b.ok ? "✓" : "!"} จำหน่าย ${dis}</span>`;
   }
 
   let draftT;
