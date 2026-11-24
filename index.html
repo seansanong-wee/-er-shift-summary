@@ -425,6 +425,9 @@ select.sel { appearance: none; padding: 7px 30px 7px 12px; border-radius: 10px; 
 .sync-chip[data-state="loading"] .dot { background: var(--warn); animation: blink 1s ease-in-out infinite; }
 .sync-chip[data-state="error"] .dot { background: var(--crit); }
 @keyframes blink { 50% { opacity: .3; } }
+.status.blink { animation: blink 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .status.blink { animation: none; } }
+@media print { .status.blink { animation: none; } }
 .sync-grid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
 @media (max-width: 700px) { .sync-grid { grid-template-columns: 1fr; } }
 .sync-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
@@ -1586,7 +1589,7 @@ table.mini td, table.mini th { padding: 7px 8px; }
     const badHtml = `
       <div class="missing-head" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px">
         ยอด Triage / การจำหน่ายไม่ตรงกับยอดรวม
-        <span class="status ${bad.length ? "warn" : "ok"}">${bad.length ? `! ${fmtN(bad.length)} เวร` : "✓ ยอดตรงทุกเวร"}</span>
+        <span class="status ${bad.length ? "warn blink" : "ok"}">${bad.length ? `! ${fmtN(bad.length)} เวร` : "✓ ยอดตรงทุกเวร"}</span>
         ${bad.length ? `<span class="hint">กดที่เวรเพื่อแก้ไข</span>` : ""}
       </div>
       ${bad.length ? `<div class="missing-list" style="margin-top:10px">${bad.slice(0, BAD_MAX).map(({ r, mm }) =>
@@ -1606,7 +1609,7 @@ table.mini td, table.mini th { padding: 7px 8px; }
     el.innerHTML = `
       <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
         <span class="kpi-value" style="font-size:34px">${pct.toFixed(0)}<span class="unit">%</span></span>
-        <span class="status ${cls}">${icon} ${missing.length ? `ขาด ${missing.length} เวร` : "บันทึกครบทุกเวร"}</span>
+        <span class="status ${cls}${missing.length ? " blink" : ""}">${icon} ${missing.length ? `ขาด ${missing.length} เวร` : "บันทึกครบทุกเวร"}</span>
       </div>
       <div class="hint" style="margin-top:4px">บันทึกแล้ว ${fmtN(done)} จาก ${fmtN(expected)} เวรที่สิ้นสุดแล้ว</div>
       <div class="tri-bar" style="height:8px;margin-top:12px"><div style="flex:${done};background:var(--good)"></div><div style="flex:${missing.length};background:var(--crit);opacity:.7"></div></div>
